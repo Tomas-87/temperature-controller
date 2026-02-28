@@ -40,3 +40,32 @@
 .read-the-docs {
   color: #888;
 }
+
+
+/*cargando historial*/
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  height: 150px;
+}
+
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid #ccc;
+  border-top: 2px solid #222;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

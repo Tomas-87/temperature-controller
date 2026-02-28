@@ -1,20 +1,30 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import TemperatureDisplay from "./components/TemperatureDisplay";
-import TemperatureControlers from "./components/TemperatureControlers";
+import TemperatureControls from "./components/TemperatureControls";
 import HistoryList from "./components/HistoryList";
+import "./App.css";
 
 export default function App() {
   const [temperature, setTemperature] = useState(20);
-  const [history, setHistory] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [history, setHistory] = useState(() => {
+    //primer renderizado con localStorage si no hubiese seria useState([])
+    const saved = localStorage.getItem("temperatureHistory");
+    return saved ? JSON.parse(saved) : [];
+  });
 
-  const addtoHistory = (newTemp) => {
-    const entrada = {
-      temp: newTemp,
-      time: new Date().toLocaleTimeString(),
-    };
-    setHistory([...history, entrada]);
+  //guardar cada cambio en localStorage
+  useEffect(() => {
+    localStorage.setItem("temperatureHistory", JSON.stringify(history));
+  }, [history]);
+
+  //añadir historial
+  const addHistory = (newTemp) => {
+    setHistory((prev) => [
+      ...prev,
+      { time: new Date().toLocaleTimeString(), temp: newTemp },
+    ]);
   };
 
   //subir temperatura
@@ -24,7 +34,7 @@ export default function App() {
     if (newTemp > 40) return;
 
     setTemperature(newTemp);
-    addtoHistory(newTemp);
+    addHistory(newTemp);
   };
 
   //Bajar temperatura
@@ -34,25 +44,43 @@ export default function App() {
     if (newTemp < 0) return;
 
     setTemperature(newTemp);
-    addtoHistory(newTemp);
+    addHistory(newTemp);
   };
 
-  //Resetear
+  //Reset
   const resetTemperature = () => {
     setTemperature(20);
     setHistory([]);
   };
 
+  //simular carga en el historial
+  useEffect(() => {
+    if (history.length === 0) return;
+    setLoading(true);
+
+    const time = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+    return () => clearTimeout(time);
+  }, [history]);
+
   return (
     <div className="app">
       <h1>Controlador de temperatura</h1>
       <TemperatureDisplay temperature={temperature} />
-      <TemperatureControlers
+      <TemperatureControls
         incrementTemperature={incrementTemperature}
         decrementTemperature={decrementTemperature}
         resetTemperature={resetTemperature}
       />
-      <HistoryList history={history} />
+      {loading ? (
+        <div className="loading">
+          <span className="spinner" />
+          <span>Cargando historial...</span>
+        </div>
+      ) : (
+        <HistoryList history={history} />
+      )}
     </div>
   );
 }

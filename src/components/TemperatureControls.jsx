@@ -1,6 +1,6 @@
 import React from "react";
 // Cada clic en los botones
-export default function TemperatureControlers({
+export default function TemperatureControls({
   incrementTemperature,
   decrementTemperature,
   resetTemperature,
